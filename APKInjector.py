@@ -6,23 +6,23 @@ import os
 import subprocess
 
 soup = ""
+folder = ""
 
 def findPackage():
     #os.system('apktool --version')
     global soup
-    command = ["pwd"]
-    cmd = subprocess.Popen(command, stdout=subprocess.PIPE)
-    curr_dir = cmd.communicate()[0].replace('\r', '').replace('\n', '')
+    global folder
+    curr_dir = os.getcwd()
 
-
-    appname = sys.argv[1].split('.')[0]
+    appname = sys.argv[1].split('.apk')[0]
     manifest_file = curr_dir + '/' + appname + '/AndroidManifest.xml'
+    folder = curr_dir + '/' + appname
     file = open(manifest_file)
     page = file.read()
     soup = Soup(page, "xml")
     manifest = soup.find_all('activity')
     main_activity = manifest[0]['android:name']
-    checkMain(main_activity) 
+    checkMain(main_activity)
 
 
 def checkMain(activity):
@@ -30,12 +30,14 @@ def checkMain(activity):
     if str_len <= 2:
         addPackage(activity)
     else:
-        print('Main Activity: ' + changeToFolder(activity))
+        print('Main Activity Location: ' + changeToFolder(activity))
+        print folder + '/smali/' + changeToFolder(activity)
 
 def addPackage(name):
     global soup
     manifest = soup.find_all('manifest')
-    print('\r\nMain Activity: '+ changeToFolder(manifest[0]['package'] + name))
+    print('\r\nMain Activity Location: '+ changeToFolder(manifest[0]['package'] + name))
+    print folder + '/smali/' +  changeToFolder(manifest[0]['package'] + name)
 
 def changeToFolder(string):
     return string.replace('.', '/')
