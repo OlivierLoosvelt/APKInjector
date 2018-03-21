@@ -1,8 +1,10 @@
 #! python2
 from bs4 import BeautifulSoup as Soup
 from time import sleep
+import sys
 
-file = open("AndroidManifest-DB.xml")
+
+file = open(sys.argv[1])
 page = file.read()
 soup = Soup(page, "xml")
 
